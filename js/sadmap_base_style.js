@@ -27,7 +27,7 @@ const SADMAP_BASE_STYLE =
     "sources": {
         "composite": {
             "type": "geojson",
-            "data": "./umbc.geojson",
+            "data": "./data/umbc.geojson",
             "generateId": true
         }
     },

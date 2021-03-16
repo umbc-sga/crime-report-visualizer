@@ -8,6 +8,8 @@
             body {
                 margin: 0;
                 padding: 0;
+
+                font-family: sans-serif;
             }
 
             #map {
@@ -15,10 +17,9 @@
                 top: 0;
                 bottom: 0;
                 width: 100%;
-                /* z-index: 0; */
             }
 
-            #the3dlink {
+            #modeSelector {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -38,95 +39,43 @@
                 border-radius: 50%;
                 cursor: pointer;
             }
+
+            #info_container {
+                width: 30%;
+                height: 100%;
+                position: fixed;
+                background: white;
+                z-index: 1;
+            }
+
+            #info_container_close {
+                text-align: right;
+                padding: 5px;
+                margin: 0;
+            }
+
+            #info_container_close:hover {
+                cursor: pointer;
+            }
+
+            #info_title {
+                text-align: center;
+            }
         </style>
     </head>
 
     <body>
         <div id="map"></div>
-        <a id="the3dlink" href=".?3d">3D Mode</a>
+        <a id="modeSelector" href="#3d">3D Mode</a>
 
-        <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+        <div id="info_container" style="display: none;">
+            <p id="info_container_close">x</p>
+
+            <h1 id="info_title">Building Name</h1>
+        </div>
+
+        <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
         <script src="js/sadmap_base_style.js"></script>
-        <script>
-            // set the mapbox access token
-            mapboxgl.accessToken = 'pk.eyJ1IjoiZHJ5ZXJsaW50IiwiYSI6ImNrM293NWcyMzI1N3ozb2tveXZlOGZvbGEifQ.8RpXmSagHLMD7D3xqFGb_w';
-
-            // stylize mapbox map with SADMAP styles and load UMBC GeoJSON
-            const sadmapBaseStyleEdit = SADMAP_BASE_STYLE;
-            sadmapBaseStyleEdit["sources"] = {
-                "composite": {
-                    "type": "geojson",
-                    "data": "data/umbc.geojson",
-                    "generateId": true
-                }
-            };
-
-            // delete source-layer keys (quirk of Mapbox Studio...)
-            for (a of sadmapBaseStyleEdit.layers) 
-            { 
-                delete a["source-layer"];
-            }
-
-            // enable 3d mode
-            // TODO change this to anchor text to make it prettier
-            const urlParams = new URLSearchParams(window.location.search);
-            const param3d = urlParams.get('3d');
-            if (param3d != null) 
-            {
-                // show 3d buildings layer
-                sadmapBaseStyleEdit.layers.find(x => x.id == "buildings 3d").layout = {};
-                
-                // hide flat buildings layers
-                sadmapBaseStyleEdit.layers.find(x => x.id == "buildings upper layer").layout = { "visibility": "none" };
-                sadmapBaseStyleEdit.layers.find(x => x.id == "buildings").layout = { "visibility": "none" };
-
-                document.querySelector("#the3dlink").setAttribute("href", ".?");
-                document.querySelector("#the3dlink").text = "Flat Mode";
-            }
-
-            // create map
-            const map = new mapboxgl.Map({
-                container: "map",
-                style: SADMAP_BASE_STYLE,
-                center: [-76.71255, 39.25432],
-                zoom: 13
-            });
-
-            // add navigation control buttons to top right of map
-            const nav = new mapboxgl.NavigationControl();
-            map.addControl(nav, "top-right");
-
-            // location look up table for name to lat-lng
-            const LOCATIONS = {
-                "Public Policy Building": [-76.70895, 39.25530]
-            };
-
-            fetch("data/01-2020.json")
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(x => {
-                        console.log(x.location)
-                        if (x.location in LOCATIONS)
-                        {
-                            // create a HTML element for each feature
-                            const el = document.createElement("div");
-                            el.className = "marker";
-
-                            // TODO check if there is a marker for that point already
-                            // can we just append to the popup for each incident?
-
-                            // create a marker for the incident
-                            new mapboxgl.Marker(el)
-                                .setLngLat(LOCATIONS[x.location])
-                                .setPopup(new mapboxgl.Popup({ offset: 25 })
-                                    .setHTML(`
-                                        ${x.incident}
-                                    `)
-                                )
-                                .addTo(map);
-                        }
-                    });
-                })
-        </script>
+        <script src="js/app.js"></script>
     </body>
 </html>
