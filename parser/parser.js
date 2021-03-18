@@ -16,7 +16,7 @@ month = month < 10 ? "0" + month : "" + month;
 const year = new Date().getUTCFullYear();
 
 const url = `https://police.umbc.edu/files/${year}/${month}/Daily-Log-${month}_${year}-1.pdf`
-
+ 
 console.log(url)
 
 const INPUT_DIR = "./input_data";
