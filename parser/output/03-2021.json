@@ -1,0 +1,40 @@
+[
+    {
+        "incident": "Fraud - False Pretense/Swindle",
+        "reportDate": 1614816060000,
+        "location": "Patapsco Hall",
+        "onCampus": true,
+        "timeStart": 1614516660000,
+        "timeEnd": 1614808800000,
+        "incidentClass": "Fraud",
+        "cleryStatOnly": false,
+        "incidentSubClass": "Theft-All Others",
+        "disposition": "Open",
+        "dateModified": null
+    },
+    {
+        "incident": "Fraud - False Pretense/Swindle",
+        "reportDate": 1614864660000,
+        "location": "Engineering Bldg",
+        "onCampus": true,
+        "timeStart": 1614519060000,
+        "timeEnd": 1614519240000,
+        "incidentClass": "Fraud",
+        "cleryStatOnly": false,
+        "incidentSubClass": "Theft-All Others",
+        "disposition": "Suspended",
+        "dateModified": null
+    },
+    {
+        "incident": "4th/Burglary (No Force)",
+        "reportDate": 1614878040000,
+        "location": "Albin Kuhn Library Bldg",
+        "onCampus": true,
+        "timeStart": 1614472200000,
+        "timeEnd": 1614475800000,
+        "incidentClass": "Burglary",
+        "cleryStatOnly": false,
+        "disposition": "Open",
+        "dateModified": null
+    }
+]

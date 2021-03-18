@@ -1,0 +1,19 @@
+{
+  "name": "interactive-crime-map",
+  "version": "1.0.3",
+  "description": "An interactive crime map visualizer, companion to crime-report-parser",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbc-sga/crime-report-visualizer.git"
+  },
+  "author": "Rees Draminski, Dariush Aligholizadeh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/umbc-sga/crime-report-visualizer/issues"
+  },
+  "homepage": "https://github.com/umbc-sga/crime-report-visualizer#readme"
+}
