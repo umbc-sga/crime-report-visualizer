@@ -39,6 +39,7 @@ async function processData() {
         
         // write the data from the PDF to a JSON file
         fs.writeFileSync(`output/${filename.replace("pdf", "json")}`, JSON.stringify(data, null, 4));
+        fs.writeFileSync(`../data/${filename.replace("pdf", "json")}`, JSON.stringify(data, null, 4));
     }
 };
 
@@ -78,7 +79,10 @@ async function getDataFromPDF(filename) {
         };
 
         for (let i = 0; i < reconstructedLines.length; i++) {
-            const line = reconstructedLines[i];
+            state = ''
+            let line = reconstructedLines[i];
+
+            console.log(line)
 
             // get the state depending on what the line starts with
             if (line.startsWith("Date Reported")) state = "reportDate";
@@ -91,41 +95,50 @@ async function getDataFromPDF(filename) {
             // skip processing the summary line at the end of the report
             else if (line.indexOf("incident(s) listed") != -1) break;
 
+            console.log(line, '\n')
+
             // process a "Report Date:" line
             if (state == "reportDate") 
             {
+                if(line.replace("Date Reported:","").length == 0) line += reconstructedLines[i-1]
                 entry.reportDate = parseDateLine(line.replace("Date Reported:", ""));
             }
             // process a "General Location:" line
             else if (state == "location") 
-            {
+            {  
+                if(line.replace("General Location:","").length == 0) line += reconstructedLines[i-1]
                 let locationLine = line;
                 locationLine = locationLine.replace("General Location:", "");
-
+                
                 const tokens = locationLine.split(" - ");
-
+                
                 entry.location = tokens[0];
                 entry.onCampus = tokens.includes("On Campus");
+                console.log("AHHH" + locationLine)
             }
             // process a "Date Occurred From:" line
             else if (state == "timeStart") 
             {
+                if(line.replace("Date Occurred From:","").length == 0) line += reconstructedLines[i-1]
                 entry.timeStart = parseDateLine(line.replace("Date Occurred From:", ""));
             }
             // process a "Date Occurred To:" line
             else if (state == "timeEnd") 
             {
+                if(line.replace("Date Occurred To:","").length == 0) line += reconstructedLines[i-1]
                 entry.timeEnd = parseDateLine(line.replace("Date Occurred To:", ""));
             }
             // process an "Incident/Offenses:" line
             else if (state == "incident") 
             {
+                if(line.replace("Incident/Offenses:","").length == 0) line += reconstructedLines[i-1]
                 // append to incident line in case it's multiple lines
                 entry.incident += line.replace("Incident/Offenses:", "");
             }
             // process a "Disposition:" line
             else if (state == "disposition") 
             {
+                if(line.replace("Disposition:","").length == 0) line += reconstructedLines[i-1]
                 // once we are in this state, we know the incident line is complete so we can process it
                 const incidentClass = entry.incident.substring(0, entry.incident.indexOf("-") - 1);
                 entry.incidentClass = properCapitalize(incidentClass);
@@ -174,6 +187,7 @@ async function getDataFromPDF(filename) {
             // process a "Modified Date:" line
             else if (state == "dateModified") 
             {
+                if(line.replace("Date Reported:","").length == 0) line += reconstructedLines[i-1]
                 entry.dateModified = parseDateLine(line.replace("Modified Date:", ""));
 
                 // add a deep copy of the entry object to the incident entries array

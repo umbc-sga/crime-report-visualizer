@@ -43,7 +43,6 @@ let addIncidentLocations = () => {
     let month = new Date().getMonth()+1 //getMonth is zero based
     month = month < 10 ? "0" + month : "" + month;
     let year = new Date().getUTCFullYear();
-    
 
     //TODO:
     //try to find in LOCATIONS, if cant geoguessr thing the geocoder
