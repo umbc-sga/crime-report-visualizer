@@ -1,0 +1,38 @@
+[
+    {
+        "incident": "PAT-OPEN",
+        "reportDate": 1614816060000,
+        "location": "02/28/21",
+        "onCampus": false,
+        "timeStart": 1614808800000,
+        "timeEnd": null,
+        "incidentClass": "Pa",
+        "cleryStatOnly": false,
+        "disposition": "03/08/21 - Mon At 15:20",
+        "dateModified": null
+    },
+    {
+        "incident": "INV-SUSPENDED",
+        "reportDate": 1614864660000,
+        "location": "02/28/21",
+        "onCampus": false,
+        "timeStart": 1614519240000,
+        "timeEnd": null,
+        "incidentClass": "In",
+        "cleryStatOnly": false,
+        "disposition": "03/09/21 - Tue At 13:27",
+        "dateModified": null
+    },
+    {
+        "incident": "PAT-OPEN",
+        "reportDate": 1614878040000,
+        "location": "02/27/21",
+        "onCampus": false,
+        "timeStart": 1614475800000,
+        "timeEnd": null,
+        "incidentClass": "Pa",
+        "cleryStatOnly": false,
+        "disposition": "03/05/21 - Fri At 12:26",
+        "dateModified": null
+    }
+]

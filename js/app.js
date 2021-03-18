@@ -8,6 +8,8 @@ const infoContainerTitle = document.getElementById("info_title");
 
 // object to hold events: key is date, value is array of XML event DOM objects from myUMBC
 const events = {};
+// object to hold locations, analogous to the events object
+const event_locations = {};
 
 let coords = [];
 let incidents = []
@@ -38,11 +40,15 @@ map.on("click", "buildings", e => {
 
 
 let addIncidentLocations = () => {
-    month = new Date().getMonth()+1 //getMonth is zero based
+    let month = new Date().getMonth()+1 //getMonth is zero based
     month = month < 10 ? "0" + month : "" + month;
-    year = new Date().getUTCFullYear();
+    let year = new Date().getUTCFullYear();
+    
 
-    fetch(`data/${'01'}-${year}.json`) //TAKE OFF THE -1 LATER
+    //TODO:
+    //try to find in LOCATIONS, if cant geoguessr thing the geocoder
+
+    fetch(`data/${month}-${year}.json`)
     .then(response => response.json())
     .then(data => {
         console.log(data)
@@ -60,47 +66,84 @@ let addIncidentLocations = () => {
             
 
             if(x.location != "Off Campus"){
-                incidents.push(x.incident)
-                bingGeocoder.geocode((x.location.toUpperCase().includes("UMBC") ? '' : 'UMBC ') + x.location, function(result){
-                    console.log(x.incident, x.location)
-                    coordinates = [result[0]['longitude'], result[0]['latitude']]
-                    coords.push(coordinates)
-        
+                if(x.location in LOCATIONS){
+                    new mapboxgl.Marker({color: x.incidentClass=='Interference'?'orange':'red'})
+                    .setLngLat(LOCATIONS[x.location])
+                    .setPopup(new mapboxgl.Popup({ offset: 25 })
+                        .setHTML(`
+                            Incident: ${x.incident}
+                        `)
+                    )
+                    .addTo(map);
+                } else{
+                    incidents.push(x.incident)
+                    bingGeocoder.geocode((x.location.toUpperCase().includes("UMBC") ? '' : 'UMBC ') + x.location, function(result){
+                        console.log(x, x.incident, x.location)
+                        coordinates = [result[0]['longitude'], result[0]['latitude']]
+                        coords.push(coordinates)
+            
 
-                    if (x.location in LOCATIONS || coordinates.length == 2){
-                        console.log(coordinates)
-                            
-                        // create a HTML element for each feature
-                        const el = document.createElement("div");
-                        el.className = "marker";
+                        if (coordinates.length == 2){
+                            console.log(coordinates)
 
-                        // TODO check if there is a marker for that point already
-                        // can we just append to the popup for each incident?
+                            // TODO check if there is a marker for that point already
+                            // can we just append to the popup for each incident?
 
-                        // TODO: change color of marker based on incident,
-                        // for example whether or not its closed, if its a robbery, etc.
+                            // TODO: change color of marker based on incident,
+                            // for example whether or not its closed, if its a robbery, etc.
 
-                        // create a marker for the incident
-                        new mapboxgl.Marker(el)
-                            .setLngLat((coordinates.length == 2 ? coordinates : LOCATIONS[x.location]))
-                            .setPopup(new mapboxgl.Popup({ offset: 25 })
-                                .setHTML(`
-                                    ${x.incident}
-                                `)
-                            )
-                            .addTo(map);
-                            
-                    }
-                })
+                            // create a marker for the incident
+                            new mapboxgl.Marker({color: x.incidentClass=='Interference'?'orange':'red'})
+                                .setLngLat((coordinates.length == 2 ? coordinates : LOCATIONS[x.location]))
+                                .setPopup(new mapboxgl.Popup({ offset: 25 })
+                                    .setHTML(`
+                                        ${x.incident}
+                                    `)
+                                )
+                                .addTo(map);
+                                
+                        }
+                    })
+                }
             }
         });
     });
+}
+
+let markEvents = data => {
+    //data is an array of two dictionaries, first is the events and second is the location of those events
+
+    let keys = Object.keys(data[1])
+
+    keys.forEach(key => {
+        data[1][key].forEach((x, i) => {
+            if(x.innerHTML != "Online"){
+                let coord = [x.getAttribute('longitude'), x.getAttribute('latitude')]
+
+                new mapboxgl.Marker({color: 'blue'})
+                    .setLngLat(coord)
+                    .setPopup(new mapboxgl.Popup({ offset: 25 })
+                        .setHTML(`
+                            Event: ${data[0][key][i].getElementsByTagName('Title')[0].innerHTML}
+                        `)
+                    )
+                    .addTo(map);
+            }
+            else{
+                //this is fired if the location is "Online"
+
+                //make it on the center of umbc or something?
+            }
+                    
+        })
+    })
 }
 
 let changeVisualizationMode = () => {
     const hash = window.location.hash.substr(1);
 
     if (hash == "3d") {
+        //enable pitching and rotating to properly see 3d view
         map.dragRotate.enable();
         map.touchPitch.enable()
         // show 3d buildings layer
@@ -111,10 +154,12 @@ let changeVisualizationMode = () => {
         SADMAP_BASE_STYLE.layers.find(x => x.id == "buildings").layout = { "visibility": "none" };
     }
     else if (hash == "flat"){
+        //disable the ability to tilt and set rotation to make everything look corrent
         map.dragRotate.disable();
         map.touchPitch.disable()
         map.setPitch(0)
         map.setBearing(19.943)
+
         // hide 3d buildings layer
         SADMAP_BASE_STYLE.layers.find(x => x.id == "buildings 3d").layout = { "visibility": "none" };
 
@@ -146,10 +191,6 @@ let changeVisualizationMode = () => {
     // map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': hash=='3d'? 1.5 : 0 });
 }
 
-/**
- * Initialize the UI components on script load.
- */
-// (function() {
 // delete source-layer keys (quirk of Mapbox Studio...)
 for (a of SADMAP_BASE_STYLE.layers) 
 { 
@@ -182,21 +223,20 @@ fetch("https://apps.sga.umbc.edu/api/events/today")
     .then(res => res.text())
     .then(data => {
         // parse the XML into DOM objects
+        // FIND LOCATION TAG
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(data, "text/xml");
 
         // store the events associated with today's date
         const today = new Date().toLocaleDateString("en-CA");
         events[today] = [...xmlDoc.getElementsByTagName("Event")];
-        console.log(events)
+        event_locations[today] = [...xmlDoc.getElementsByTagName("Location")];
+
+        markEvents([events, event_locations])
+
+        console.log(events, event_locations)
         });
-// })();
 
 
-setTimeout(addIncidentLocations, 1000);
 
-let timer = setInterval(() => {
-    if(coords.length == incidents.length){
-        
-    }
-}, 2000)
+addIncidentLocations();
