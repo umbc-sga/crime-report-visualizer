@@ -3,12 +3,12 @@
         <title>Crime Report Visualizer | Powered by SADMAP</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css">
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet">
         <style>
             body {
                 margin: 0;
                 padding: 0;
-
+                background-color: #e2dcbb;
                 font-family: sans-serif;
             }
 
@@ -29,8 +29,12 @@
                 background-color: white;
                 border-radius: 4px;
                 box-shadow: 0 0 0 2px rgba(0, 0, 0, .1);
+				text-decoration: none;
+				color: black;
             }
-
+			#modeSelector:hover{
+				color: gray;
+			}
             .marker {
                 background-image: url('mapbox-icon.png');
                 background-size: cover;
@@ -66,7 +70,7 @@
 
     <body>
         <div id="map"></div>
-        <a id="modeSelector" href="#3d">3D Mode</a>
+        <a id="modeSelector">Change to 3D Mode</a>
 
         <div id="info_container" style="display: none;">
             <p id="info_container_close">x</p>
@@ -76,6 +80,8 @@
 
         <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
         <script src="js/sadmap_base_style.js"></script>
+        <script src="geocoder/dist/geocoder.js"></script>
+        <script src="js/locations.js"></script>
         <script src="js/app.js"></script>
     </body>
 </html>
